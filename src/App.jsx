@@ -1,10 +1,11 @@
 import { Heart, MessageCircle, User, X } from "lucide-react";
+import { useState } from "react";
 export default function App() {
   const ProfileSelector = () => (
     <div className="rounded-lg overflow-hidden bg-white shadow-lg">
       <div className="relative">
         <img src="http://127.0.0.1:8081/0157aa70-0034-420a-bd76-2a8912defe16.jpg" />
-        <div className="absolute bottom-0 left-0 right-0 text-white p-4 bg-gradient-to-t from-black">
+        <div className="absolute bottom-0 left-0 right-0 text-white p-4 bg-linear-to-t from-black">
           <h2 className="text-3xl font-bold">Pravat Mishra, 26</h2>
         </div>
       </div>
@@ -68,14 +69,25 @@ export default function App() {
       </ul>
     </div>
   );
+
+  const [currentScreen, setCurrentScreen] = useState("profile");
+
+  const renderScreen = () => {
+    switch (currentScreen) {
+      case "profile":
+        return <ProfileSelector />;
+      case "matches":
+        return <MatchesList />;
+    }
+  };
+
   return (
     <div className="max-w-md mx-auto p-4">
       <nav className="flex justify-between mb-4">
-        <User />
-        <MessageCircle />
+        <User onClick={() => setCurrentScreen("profile")} />
+        <MessageCircle onClick={() => setCurrentScreen("matches")} />
       </nav>
-      {/* <ProfileSelector /> */}
-      <MatchesList />
+      {renderScreen()}
     </div>
   );
 }
