@@ -4,11 +4,13 @@ import saveSwipe from "../saveSwipe";
 import ChatScreen from "./ChatScreen";
 import MatchesList from "./MatchList";
 import ProfileSelector from "./ProfileSelector";
+import fetchMatches from "./fetchMatches";
 import fetchRandomProfile from "./fetchRandomProfile";
 
 export default function App() {
   const [currentScreen, setCurrentScreen] = useState("profile");
   const [currentProfile, setCurrentProfile] = useState(null);
+  const [matches, setMatches] = useState([]);
 
   const loadRandomProfile = async () => {
     try {
@@ -19,13 +21,25 @@ export default function App() {
     }
   };
 
+  const loadMatches = async () => {
+    try {
+      const matches = await fetchMatches();
+      setMatches(matches);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   useEffect(() => {
     loadRandomProfile();
-  }, {});
+    loadMatches();
+  }, []);
 
-  const onSwipe = (profileId, direction) => {
+  const onSwipe = async (profileId, direction) => {
+    loadRandomProfile();
     if (direction === "right") {
-      saveSwipe(profileId);
+      await saveSwipe(profileId);
+      await loadMatches();
     }
     loadRandomProfile();
   };
@@ -35,7 +49,12 @@ export default function App() {
       case "profile":
         return <ProfileSelector profile={currentProfile} onSwipe={onSwipe} />;
       case "matches":
-        return <MatchesList onSelectMatch={() => setCurrentScreen("chat")} />;
+        return (
+          <MatchesList
+            matches={matches}
+            onSelectMatch={() => setCurrentScreen("chat")}
+          />
+        );
       case "chat":
         return <ChatScreen />;
     }
