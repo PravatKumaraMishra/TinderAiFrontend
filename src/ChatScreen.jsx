@@ -1,5 +1,6 @@
 import { useState } from "react";
-const ChatScreen = () => {
+
+const ChatScreen = ({ currentMatch, conversation }) => {
   const [input, setInput] = useState("");
 
   const handleSend = () => {
@@ -8,22 +9,17 @@ const ChatScreen = () => {
       setInput("");
     }
   };
-  return (
+  return currentMatch ? (
     <div className="rounded-lg shadow-lg p-4">
-      <h2 className="text-2xl font-bold mb-4">Chat with Foo Bar</h2>
+      <h2 className="text-2xl font-bold mb-4">
+        Chat with {currentMatch.firstName} {currentMatch.lastName}
+      </h2>
       <div className="h-[50vh] border rounded overflow-y-auto mb-4 p-2">
-        {[
-          "Hi",
-          "How are you?",
-          "How are you?",
-          "How are you?",
-          "How are you?",
-          "How are you?",
-          "How are you?",
-          "How are you?",
-        ].map((message, index) => (
+        {conversation.map((message, index) => (
           <div key={index}>
-            <div className="mb-4 p-2 rounded bg-gray-100">{message}</div>
+            <div className="mb-4 p-2 rounded bg-gray-100">
+              {message.messageText}
+            </div>
           </div>
         ))}
       </div>
@@ -43,6 +39,8 @@ const ChatScreen = () => {
         </button>
       </div>
     </div>
+  ) : (
+    <div>Loading...</div>
   );
 };
 export default ChatScreen;

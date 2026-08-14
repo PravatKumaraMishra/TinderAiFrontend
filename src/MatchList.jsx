@@ -15,7 +15,9 @@ const MatchesList = ({ matches, onSelectMatch }) => {
             <li key={match.profile.id} className="mb-2">
               <button
                 className="w-full hover:bg-gray-100 rounded flex item-center"
-                onClick={onSelectMatch}
+                onClick={() =>
+                  onSelectMatch(match.profile, match.conversationId)
+                }
               >
                 <img
                   src={"http://localhost:8081/" + match.profile.imageUrl}
