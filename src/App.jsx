@@ -51,9 +51,19 @@ export default function App() {
     const conversation = await fetchConversation(conversationId);
     setCurrentMatchAndConversation({
       match: profile,
-      conversation: conversation.messages,
+      conversation: conversation,
     });
     setCurrentScreen("chat");
+  };
+
+  const refreshChatState = async () => {
+    const conversation = await fetchConversation(
+      currentMatchAndConversation.conversation.id,
+    );
+    setCurrentMatchAndConversation({
+      match: currentMatchAndConversation.match,
+      conversation: conversation,
+    });
   };
 
   const renderScreen = () => {
@@ -68,6 +78,7 @@ export default function App() {
           <ChatScreen
             currentMatch={currentMatchAndConversation.match}
             conversation={currentMatchAndConversation.conversation}
+            refreshState={refreshChatState}
           />
         );
     }
