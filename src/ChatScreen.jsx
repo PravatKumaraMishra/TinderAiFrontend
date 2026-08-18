@@ -63,6 +63,7 @@ const ChatScreen = ({ currentMatch, conversation, refreshState }) => {
     }
   };
 
+  const imageUrl = `http://127.0.0.1:8080/images/${currentMatch.imageUrl}`;
   return currentMatch ? (
     <div className="rounded-lg shadow-lg p-4">
       <h2 className="text-2xl font-bold mb-4">
@@ -89,7 +90,7 @@ const ChatScreen = ({ currentMatch, conversation, refreshState }) => {
                 <User size={15} />
               ) : (
                 <img
-                  src={`http://127.0.0.1:8081/${currentMatch.imageUrl}`}
+                  src={imageUrl}
                   className="w-11 h-11 rounded-full"
                   alt={currentMatch.firstName}
                 />
@@ -112,7 +113,7 @@ const ChatScreen = ({ currentMatch, conversation, refreshState }) => {
           <div className="flex justify-start mb-4">
             <div className="flex items-end flex-row">
               <img
-                src={`http://127.0.0.1:8081/${currentMatch.imageUrl}`}
+                src={imageUrl}
                 className="w-11 h-11 rounded-full"
                 alt={currentMatch.firstName}
               />

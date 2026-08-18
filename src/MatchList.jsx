@@ -20,7 +20,7 @@ const MatchesList = ({ matches, onSelectMatch }) => {
                 }
               >
                 <img
-                  src={"http://localhost:8081/" + match.profile.imageUrl}
+                  src={"http://localhost:8080/images/" + match.profile.imageUrl}
                   className="w-16 h-16 rounded-full mr-3 object-cover"
                 />
                 <span>
