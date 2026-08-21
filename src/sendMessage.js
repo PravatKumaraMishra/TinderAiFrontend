@@ -1,6 +1,6 @@
 const sendMessage = async (conversationId, message) => {
   const response = await fetch(
-    `http://localhost:8080/conversations/${conversationId}`,
+    `${import.meta.env.VITE_BACKEND_URL}/conversations/${conversationId}`,
     {
       method: "POST",
       headers: {

@@ -4,7 +4,9 @@ const ProfileSelector = ({ profile, onSwipe }) => {
   return profile ? (
     <div className="rounded-lg overflow-hidden bg-white shadow-lg">
       <div className="relative">
-        <img src={"http://localhost:8080/images/" + profile.imageUrl} />
+        <img
+          src={`${import.meta.env.VITE_BACKEND_URL}/images/${profile.imageUrl}`}
+        />
         <div className="absolute bottom-0 left-0 right-0 text-white p-4 bg-linear-to-t from-black">
           <h2 className="text-3xl font-bold">
             {profile.firstName + " " + profile.lastName + ", " + profile.age}

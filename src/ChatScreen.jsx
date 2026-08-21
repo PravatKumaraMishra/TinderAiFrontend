@@ -63,7 +63,7 @@ const ChatScreen = ({ currentMatch, conversation, refreshState }) => {
     }
   };
 
-  const imageUrl = `http://127.0.0.1:8080/images/${currentMatch.imageUrl}`;
+  const imageUrl = `${import.meta.env.VITE_BACKEND_URL}/images/${currentMatch.imageUrl}`;
   return currentMatch ? (
     <div className="rounded-lg shadow-lg p-4">
       <h2 className="text-2xl font-bold mb-4">
