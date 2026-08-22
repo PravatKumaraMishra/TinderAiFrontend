@@ -1,12 +1,12 @@
 import { MessageCircle, User } from "lucide-react";
 import { useEffect, useState } from "react";
-import saveSwipe from "../saveSwipe";
 import ChatScreen from "./ChatScreen";
 import MatchesList from "./MatchList";
 import ProfileSelector from "./ProfileSelector";
 import fetchConversation from "./fetchConversation";
 import fetchMatches from "./fetchMatches";
 import fetchRandomProfile from "./fetchRandomProfile";
+import saveSwipe from "./saveSwipe";
 
 export default function App() {
   const [currentScreen, setCurrentScreen] = useState("profile");
@@ -39,7 +39,6 @@ export default function App() {
   }, []);
 
   const onSwipe = async (profileId, direction) => {
-    loadRandomProfile();
     if (direction === "right") {
       await saveSwipe(profileId);
       await loadMatches();
