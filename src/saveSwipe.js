@@ -1,5 +1,5 @@
 const saveSwipe = async (profileId) => {
-  const response = await fetch("http://localhost:8080/matches", {
+  const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/matches`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
