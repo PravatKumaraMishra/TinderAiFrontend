@@ -1,18 +1,58 @@
-# React + Vite
+# Tinder AI Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+A React interface for browsing generated profiles, creating matches, and chatting through a companion backend.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- Browse profiles and accept or skip them.
+- View matches and open conversations.
+- Send chat messages and refresh conversation history.
+- Display typing animation and focus on new messages.
 
-## React Compiler
+## Requirements
 
-The React Compiler is enabled on this template. See [this documentation](https://react.dev/learn/react-compiler) for more information.
+- Node.js `^20.19.0 || >=22.12.0` and npm.
+- A running backend exposing profiles, matches, conversations, and images.
 
-Note: This will impact Vite dev & build performances.
+## Run locally
 
-## Expanding the Oxlint configuration
+```sh
+git clone https://github.com/PravatKumaraMishra/TinderAiFrontend.git
+cd TinderAiFrontend
+npm ci
+```
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and Oxlint's TypeScript related rules in your project.
+Copy `.env.example` to `.env.local`:
+
+```dotenv
+VITE_BACKEND_URL=http://localhost:8080
+```
+
+Start [TinderAiBackend](https://github.com/PravatKumaraMishra/TinderAiBackend) separately, then run this frontend. Use the profile controls, switch to matches, and open a chat.
+
+```sh
+npm run dev
+```
+
+Open the local URL printed by Vite (normally `http://localhost:5173`).
+
+## Available commands
+
+| Command | Script |
+| --- | --- |
+| `npm run dev` | `vite` |
+| `npm run build` | `vite build` |
+| `npm run lint` | `oxlint` |
+| `npm run preview` | `vite preview` |
+
+`npm run preview` serves the output of `npm run build`; it does not build the project itself.
+
+## Project structure
+
+- `src/App.jsx`: screen navigation and state.
+- `src/ProfileSelector.jsx`, `src/MatchList.jsx`, `src/ChatScreen.jsx`: screens.
+- `src/fetch*.js`, `src/saveSwipe.js`, `src/sendMessage.js`: API helpers.
+
+## Notes
+
+The UI needs the backend to return profiles and conversations. Check backend availability, its image route, and CORS if the screen remains on Loading. Backend AI configuration is documented in its repository. This is a learning application.
