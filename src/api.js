@@ -1,10 +1,37 @@
 export const BACKEND_URL = (import.meta.env?.VITE_BACKEND_URL || "http://localhost:8080").replace(/\/$/, "");
 let accessToken = null;
 let sessionVersion = 0;
+let refreshing;
+
+export function refreshSession() {
+  if (refreshing) return refreshing;
+  const version = sessionVersion;
+  const renew = () => {
+    if (version !== sessionVersion) throw new ApiError("Your session changed.", 401);
+    return apiRequest("/auth/refresh", { method: "POST", authenticated: false });
+  };
+  const request = globalThis.navigator?.locks
+    ? navigator.locks.request("tinder-session-refresh", renew) : renew();
+  const pending = request.then((token) => {
+    if (version !== sessionVersion) throw new ApiError("Your session changed.", 401);
+    accessToken = token.accessToken;
+    return token;
+  }).finally(() => { if (refreshing === pending) refreshing = undefined; });
+  refreshing = pending;
+  return pending;
+}
+
+export async function endSession() {
+  setAccessToken(null);
+  const revoke = () => apiRequest("/auth/logout", { method: "POST", authenticated: false });
+  if (globalThis.navigator?.locks) await navigator.locks.request("tinder-session-refresh", revoke);
+  else await revoke();
+}
 
 export function setAccessToken(token) {
   accessToken = token;
   sessionVersion += 1;
+  refreshing = undefined;
 }
 
 export class ApiError extends Error {
@@ -14,7 +41,7 @@ export class ApiError extends Error {
   }
 }
 
-export async function apiRequest(path, { body, authenticated = true, ...options } = {}) {
+export async function apiRequest(path, { body, authenticated = true, retry = true, ...options } = {}) {
   const version = sessionVersion;
   const headers = { ...options.headers };
   if (authenticated) {
@@ -24,11 +51,24 @@ export async function apiRequest(path, { body, authenticated = true, ...options 
   if (body !== undefined) headers["Content-Type"] = "application/json";
   const response = await fetch(`${BACKEND_URL}${path}`, {
     ...options, headers, body: body === undefined ? undefined : JSON.stringify(body),
-    credentials: "omit",
+    credentials: path.startsWith("/auth/") ? "include" : "omit",
   });
   if (authenticated && version !== sessionVersion) throw new ApiError("Your session changed.", 401);
   if (!response.ok) {
     if (response.status === 401 && authenticated) {
+      if (retry) {
+        try {
+          // A different request may already have renewed this token.
+          if (headers.Authorization === `Bearer ${accessToken}`) await refreshSession();
+        } catch (error) {
+          if (version !== sessionVersion) throw new ApiError("Your session changed.", 401);
+          if (error.status !== 401) throw error;
+          setAccessToken(null);
+          window.dispatchEvent(new Event("auth-expired"));
+          throw error;
+        }
+        return apiRequest(path, { ...options, body, authenticated, retry: false });
+      }
       setAccessToken(null);
       window.dispatchEvent(new Event("auth-expired"));
     }

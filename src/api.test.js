@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { afterEach, test } from "node:test";
-import { apiRequest, setAccessToken } from "./api.js";
+import { apiRequest, setAccessToken, refreshSession, endSession } from "./api.js";
 import sendMessage from "./sendMessage.js";
 
 const originalFetch = globalThis.fetch;
@@ -72,5 +72,47 @@ test("signing out prevents further private requests", async () => {
   setAccessToken("alice");
   setAccessToken(null);
   globalThis.fetch = () => { throw new Error("Must not call backend"); };
+  await assert.rejects(apiRequest("/matches"), { status: 401 });
+});
+
+
+test("reload restores an access token using only the HttpOnly cookie", async () => {
+  setAccessToken(null);
+  globalThis.fetch = async (url, options) => {
+    if (url.endsWith("/auth/refresh")) {
+      assert.equal(options.credentials, "include");
+      assert.equal(options.headers.Authorization, undefined);
+      return Response.json({ accessToken: "restored" });
+    }
+    assert.equal(options.headers.Authorization, "Bearer restored");
+    return Response.json({ id: "alice" });
+  };
+  await refreshSession();
+  assert.equal((await apiRequest("/users/me")).id, "alice");
+});
+
+test("concurrent expired requests share one refresh and retry once", async () => {
+  setAccessToken("expired");
+  let refreshes = 0;
+  globalThis.fetch = async (url, options) => {
+    if (url.endsWith("/auth/refresh")) {
+      refreshes++;
+      return Response.json({ accessToken: "renewed" });
+    }
+    return options.headers.Authorization === "Bearer renewed"
+      ? Response.json([]) : new Response(null, { status: 401 });
+  };
+  await Promise.all([apiRequest("/matches"), apiRequest("/matches")]);
+  assert.equal(refreshes, 1);
+});
+
+test("logout revokes the cookie session and prevents private requests", async () => {
+  setAccessToken("alice");
+  globalThis.fetch = async (url, options) => {
+    assert.ok(url.endsWith("/auth/logout"));
+    assert.equal(options.credentials, "include");
+    return new Response(null, { status: 204 });
+  };
+  await endSession();
   await assert.rejects(apiRequest("/matches"), { status: 401 });
 });

@@ -4,7 +4,7 @@ import AccountScreen from "./AccountScreen";
 import ChatScreen from "./ChatScreen";
 import MatchesList from "./MatchList";
 import ProfileSelector from "./ProfileSelector";
-import { apiRequest, setAccessToken } from "./api";
+import { apiRequest, setAccessToken, refreshSession, endSession } from "./api";
 import fetchConversation from "./fetchConversation";
 import fetchMatches from "./fetchMatches";
 import fetchRandomProfile from "./fetchRandomProfile";
@@ -13,28 +13,44 @@ import saveSwipe from "./saveSwipe";
 export default function App() {
   const [account, setAccount] = useState(null);
   const [notice, setNotice] = useState("");
-  const expiryTimer = useRef(null);
+  const [restoring, setRestoring] = useState(true);
+  const [restoreError, setRestoreError] = useState("");
+  const restoration = useRef(null);
   function logout(message = "") {
-    clearTimeout(expiryTimer.current);
     setAccessToken(null); setAccount(null); setNotice(message);
     window.google?.accounts?.id?.disableAutoSelect();
   }
   useEffect(() => {
     const expired = () => logout("Your session expired. Please sign in again.");
     window.addEventListener("auth-expired", expired);
-    return () => { window.removeEventListener("auth-expired", expired); clearTimeout(expiryTimer.current); };
+    return () => { window.removeEventListener("auth-expired", expired); };
   }, []);
+  useEffect(() => {
+    let active = true;
+    if (!restoration.current) restoration.current = refreshSession().then(() => apiRequest("/users/me"));
+    restoration.current.then((me) => { if (active) setAccount(me); }).catch((err) => {
+      if (active && err.status !== 401) setRestoreError("Could not restore your session. Please retry.");
+    }).finally(() => { if (active) setRestoring(false); });
+    return () => { active = false; };
+  }, []);
+  async function signOut() {
+    setRestoring(true);
+    try { await endSession(); logout(); }
+    catch { setNotice("Sign-out could not be confirmed. Please retry."); }
+    finally { setRestoring(false); }
+  }
   async function authenticated(token) {
     setAccessToken(token.accessToken);
     try {
       const me = await apiRequest("/users/me");
       setAccount(me); setNotice("");
-      clearTimeout(expiryTimer.current);
-      expiryTimer.current = setTimeout(() => logout("Your session expired. Please sign in again."), token.expiresIn * 1000);
     } catch (err) { logout(); throw err; }
   }
+  if (restoring) return <main className="max-w-md mx-auto p-4" role="status">Restoring session…</main>;
+  if (restoreError) return <main className="max-w-md mx-auto p-4"><p role="alert">{restoreError}</p><button onClick={() => window.location.reload()}>Retry</button></main>;
   return <main className="max-w-md mx-auto p-4">
-    {account ? <SignedInApp key={account.id} account={account} onUpdated={setAccount} onLogout={() => logout()} />
+    {account && notice && <p role="alert">{notice}</p>}
+    {account ? <SignedInApp key={account.id} account={account} onUpdated={setAccount} onLogout={signOut} />
       : <AuthScreen onAuthenticated={authenticated} notice={notice} />}
   </main>;
 }

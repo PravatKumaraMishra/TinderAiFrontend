@@ -41,11 +41,18 @@ For new Google accounts, complete the profile before browsing/matching/chatting.
 If the same email already has a password account, sign in with the password first,
 then link Google from **My profile**. No accounts are automatically merged by email.
 
-All API calls go through `src/api.js`. Tokens stay in memory, so reloading the page
-requires signing in again. They expire after the backend's configured lifetime
-(30 minutes by default). Sign-out clears the token and unmounts account-specific UI.
-Late requests from a previous account cannot populate the next account's state.
-There is no persistent browser token storage or refresh-token flow.
+All API calls go through `src/api.js`. Access tokens stay in memory. Login sets an
+HttpOnly refresh cookie; on reload the app calls `/auth/refresh`, then `/users/me`
+before showing the signed-in interface. Expired API requests share a refresh and
+retry once. Web Locks coordinate refreshes across tabs where supported.
+Sign-out calls `/auth/logout` to revoke the refresh session. Network failures during
+startup show a retry screen. No tokens are stored in localStorage or sessionStorage.
+
+Deploy the matching backend changes. Allow the exact frontend Origin in backend
+CORS (no trailing slash), use HTTPS and `COOKIE_SECURE=true` in production.
+For local HTTP development set backend `COOKIE_SECURE=false`. Same-site hosting
+is preferred; cross-site hosting needs `COOKIE_SAME_SITE=None` and HTTPS, and may
+be blocked by third-party-cookie restrictions.
 
 Chat authors are taken from `/users/me`. Send-message requests contain only message
 text. Failed messages restore the input, and a concurrent-save conflict reloads the
