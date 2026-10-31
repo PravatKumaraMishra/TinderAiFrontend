@@ -24,15 +24,15 @@ export default function AccountScreen({ account, onUpdated }) {
     } catch (err) { setError(err.message); }
     finally { setBusy(false); }
   }
-  return <section className="rounded-xl shadow bg-white p-5 space-y-4">
-    <h1 className="text-2xl font-bold">{account.profile ? "Your profile" : "Complete your profile"}</h1>
+  return <section className="glass account-panel space-y-4">
+
     <p className="text-gray-600">{account.email}</p>
-    {!account.profile && <p>Add your details to start matching and chatting.</p>}
+
     {error && <p role="alert" className="text-red-600">{error}</p>}
     {saved && <p role="status" className="text-green-700">Profile saved.</p>}
     <ProfileForm initialProfile={account.profile} onSave={save} disabled={busy} />
     {account.googleLinked ? <p className="text-sm text-green-700">Google sign-in is linked.</p> : <div className="space-y-2 border-t pt-4">
-      <p className="text-sm">Link Google using the same email to sign in either way.</p>
+      <p className="text-sm">Connect your Google account</p>
       <GoogleSignIn onCredential={link} disabled={busy} />
     </div>}
   </section>;

@@ -81,5 +81,5 @@ export async function apiRequest(path, { body, authenticated = true, retry = tru
 
 export function imageUrl(path) {
   if (!path) return "";
-  return /^https?:\/\//.test(path) ? path : `${BACKEND_URL}/images/${encodeURIComponent(path)}`;
+  return /^(https?:\/\/|data:image\/)/.test(path) ? path : `${BACKEND_URL}/images/${encodeURIComponent(path)}`;
 }
