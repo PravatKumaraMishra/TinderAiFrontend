@@ -1,4 +1,6 @@
 export const BACKEND_URL = (import.meta.env?.VITE_BACKEND_URL || "http://localhost:8080").replace(/\/$/, "");
+// Auth stays on the frontend origin so HttpOnly cookies are first-party.
+// Vite/Vercel forward /auth requests to the configured backend.
 let accessToken = null;
 let sessionVersion = 0;
 let refreshing;
@@ -49,7 +51,7 @@ export async function apiRequest(path, { body, authenticated = true, retry = tru
     headers.Authorization = `Bearer ${accessToken}`;
   }
   if (body !== undefined) headers["Content-Type"] = "application/json";
-  const response = await fetch(`${BACKEND_URL}${path}`, {
+  const response = await fetch(path.startsWith("/auth/") ? path : `${BACKEND_URL}${path}`, {
     ...options, headers, body: body === undefined ? undefined : JSON.stringify(body),
     credentials: path.startsWith("/auth/") ? "include" : "omit",
   });

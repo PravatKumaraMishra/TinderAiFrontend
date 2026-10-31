@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    {
+      "source": "/auth/:path*",
+      "destination": "https://tinderaibackend.onrender.com/auth/:path*"
+    }
+  ]
+}

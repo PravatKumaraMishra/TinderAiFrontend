@@ -50,9 +50,9 @@ startup show a retry screen. No tokens are stored in localStorage or sessionStor
 
 Deploy the matching backend changes. Allow the exact frontend Origin in backend
 CORS (no trailing slash), use HTTPS and `COOKIE_SECURE=true` in production.
-For local HTTP development set backend `COOKIE_SECURE=false`. Same-site hosting
-is preferred; cross-site hosting needs `COOKIE_SAME_SITE=None` and HTTPS, and may
-be blocked by third-party-cookie restrictions.
+Keep `COOKIE_SAME_SITE=Lax`: authentication goes through the frontend proxy below,
+so the cookie stays first-party. The Vite proxy adapts cookie attributes for local
+HTTP development without weakening production cookies.
 
 Chat authors are taken from `/users/me`. Send-message requests contain only message
 text. Failed messages restore the input, and a concurrent-save conflict reloads the
@@ -82,3 +82,17 @@ logout, and message payloads; backend tests cover Google JWT validation and link
 
 If profiles or chats remain on Loading, check backend availability, image routes,
 and CORS. Backend AI configuration is documented in its repository.
+
+
+### First-party authentication proxy
+
+Auth requests use relative `/auth/*` URLs. Vite development and preview proxy them
+to `VITE_BACKEND_URL`; Vercel uses `vercel.json` to forward them to the Render API.
+This keeps the HttpOnly cookie on the frontend host and avoids cross-site cookie
+blocking when localhost or `tinder.pravat.me` calls `onrender.com`.
+The local Vite proxy removes Secure and converts SameSite=None to Lax on HTTP;
+production HTTPS cookies retain their security attributes. The backend must allow
+the frontend Origin in CORS. Restart Vite after changing proxy configuration.
+If the backend host changes, update both `VITE_BACKEND_URL` and the Vercel rewrite.
+Other hosting providers must provide the same `/auth/*` reverse proxy.
+Sign in once after updating: cookies on the Render host cannot migrate to localhost.

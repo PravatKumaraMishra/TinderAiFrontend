@@ -116,3 +116,15 @@ test("logout revokes the cookie session and prevents private requests", async ()
   await endSession();
   await assert.rejects(apiRequest("/matches"), { status: 401 });
 });
+
+
+test("authentication uses the frontend origin to avoid third-party cookies", async () => {
+  globalThis.fetch = async (url, options) => {
+    assert.equal(url, "/auth/login");
+    assert.equal(options.credentials, "include");
+    return Response.json({ accessToken: "signed-in" });
+  };
+  await apiRequest("/auth/login", {
+    method: "POST", authenticated: false, body: { email: "alice@example.com", password: "password" },
+  });
+});
