@@ -30,6 +30,9 @@ export default function GoogleSignIn({ onCredential, disabled = false }) {
     if (!clientId) return;
     let active = true;
     const node = container.current;
+    let observer;
+    let removeThemeListener;
+    let themeObserver;
     loadGoogleSdk().then((google) => {
       if (!active) return;
       google.accounts.id.initialize({
@@ -39,14 +42,33 @@ export default function GoogleSignIn({ onCredential, disabled = false }) {
           if (active && !disabledRef.current && response.credential) callback.current(response.credential);
         },
       });
-      google.accounts.id.renderButton(node, { theme: "outline", size: "large", width: 280, text: "signin_with" });
+      const theme = window.matchMedia("(prefers-color-scheme: dark)");
+      let lastWidth;
+      let lastTheme;
+      const render = () => {
+        const width = Math.min(400, Math.floor(node.getBoundingClientRect().width));
+        if (!active || width < 1 || (width === lastWidth && (document.documentElement.dataset.theme === "dark") === lastTheme)) return;
+        lastWidth = width; lastTheme = document.documentElement.dataset.theme === "dark";
+        node.replaceChildren();
+        google.accounts.id.renderButton(node, {
+          theme: lastTheme ? "filled_black" : "outline", size: "large",
+          width, shape: "rectangular", text: "continue_with", logo_alignment: "left",
+        });
+      };
+      render();
+      themeObserver = new MutationObserver(render);
+      themeObserver.observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+      observer = new ResizeObserver(render);
+      observer.observe(node);
+      theme.addEventListener("change", render);
+      removeThemeListener = () => theme.removeEventListener("change", render);
     }).catch((err) => { if (active) setError(err.message); });
-    return () => { active = false; if (node) node.replaceChildren(); };
+    return () => { active = false; observer?.disconnect(); themeObserver?.disconnect(); removeThemeListener?.(); if (node) node.replaceChildren(); };
   }, [clientId]);
 
   if (!clientId) return <p className="text-sm text-gray-500">Google sign-in is not configured yet.</p>;
-  return <div>
-    <div ref={container} aria-disabled={disabled} className={disabled ? "pointer-events-none opacity-50" : ""} />
+  return <div className="google-signin">
+    <div ref={container} aria-disabled={disabled} className={`google-button-host${disabled ? " pointer-events-none opacity-50" : ""}`} />
     {error && <p role="alert" className="text-red-600 text-sm mt-2">{error}</p>}
   </div>;
 }
