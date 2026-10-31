@@ -27,7 +27,7 @@ export default function AuthScreen({ onAuthenticated, notice }) {
 
     {notice && <p role="status" className="text-sm text-gray-600">{notice}</p>}
     {error && <p role="alert" className="text-red-600">{error}</p>}
-    <GoogleSignIn disabled={busy} onCredential={(credential) => authenticate("/auth/google", { credential })} />
+    <GoogleSignIn disabled={busy} onCredential={(accessToken) => authenticate("/auth/google", { accessToken })} />
     <div className="auth-divider"><span>or use email</span></div>
     {register ? <ProfileForm onSave={(profile) => authenticate("/auth/register", { email, password, profile })} disabled={busy} submitLabel="Create account">{credentials}</ProfileForm>
       : <form onSubmit={(e) => { e.preventDefault(); authenticate("/auth/login", { email, password }); }} className="space-y-3">

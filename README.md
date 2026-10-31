@@ -96,3 +96,11 @@ the frontend Origin in CORS. Restart Vite after changing proxy configuration.
 If the backend host changes, update both `VITE_BACKEND_URL` and the Vercel rewrite.
 Other hosting providers must provide the same `/auth/*` reverse proxy.
 Sign in once after updating: cookies on the Render host cannot migrate to localhost.
+
+### Google profile import
+
+Google sign-in automatically requests profile, birthday, and gender permissions in the same sign-in flow. The backend validates the Google access token for the configured OAuth client, then fetches name, photo, birthday, and gender. No separate connect or import step is shown. Enable People API in the OAuth client's Google Cloud project and configure these scopes on the OAuth consent screen (including test users while the app is in testing). Fields that Google does not share remain editable. Google access tokens are used only for sign-in and are not stored. Declined birthday/gender permissions leave those fields editable and do not prevent basic sign-in.
+
+Profile photos accept JPG, PNG, or WebP files up to 500 KB. Users can crop, zoom, and reposition the image before saving a square JPEG.
+
+If Google returns `403 access_denied` saying the app is in testing, open Google Cloud Console → Google Auth Platform → Audience for the project owning this OAuth client. Add the signing-in Google account under Test users for development. For public access, publish the app and complete the verification required for birthday/gender scopes. This restriction is enforced by Google and cannot be bypassed in application code.
