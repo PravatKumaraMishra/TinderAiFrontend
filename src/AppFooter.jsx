@@ -1,12 +1,12 @@
 export default function AppFooter() {
   return <footer className="app-footer">
     <nav className="footer-links" aria-label="Footer">
-      <a href="/terms">Terms of Service</a>
-      <a href="/privacy">Privacy Policy</a>
       <a href="https://github.com/PravatKumaraMishra/TinderAiFrontend" target="_blank" rel="noopener noreferrer">GitHub</a>
       <a href="mailto:me.sanuvai@gmail.com">Contact</a>
+      <span>Made with love by <a href="https://github.com/PravatKumaraMishra" target="_blank" rel="noopener noreferrer">Pravat Kumar Mishra</a></span>
+      <a href="/terms">Terms of Service</a>
+      <a href="/privacy">Privacy Policy</a>
     </nav>
-    <span>Made by <a href="https://github.com/PravatKumaraMishra" target="_blank" rel="noopener noreferrer">Pravat Kumar Mishra</a></span>
     <a className="coffee-button" href="https://buymeacoffee.com/pravat_io" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">☕</span> Buy me a coffee</a>
   </footer>;
 }

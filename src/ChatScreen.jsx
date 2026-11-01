@@ -1,4 +1,4 @@
-import { Send, User } from "lucide-react";
+import { Send } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import sendMessage from "./sendMessage";
 import { imageUrl as profileImageUrl } from "./api";
@@ -9,6 +9,34 @@ const ChatScreen = ({ currentMatch, conversation, currentUserId, refreshState })
   const [isTyping, setIsTyping] = useState(false);
   const [error, setError] = useState("");
   const chatContainerRef = useRef(null);
+  const composerRef = useRef(null);
+
+  useEffect(() => {
+    const viewport = window.visualViewport;
+    if (!viewport) return;
+    const composer = composerRef.current;
+    const update = () => {
+      const focused = composer?.contains(document.activeElement);
+      const keyboardOpen = focused && window.innerHeight - viewport.height > 120 && viewport.scale === 1;
+      composer?.classList.toggle("keyboard-open", keyboardOpen);
+      if (keyboardOpen) {
+        composer.style.setProperty("--composer-top", `${viewport.offsetTop + viewport.height - composer.offsetHeight}px`);
+      } else {
+        composer?.style.removeProperty("--composer-top");
+      }
+    };
+    viewport.addEventListener("resize", update);
+    viewport.addEventListener("scroll", update);
+    document.addEventListener("focusin", update);
+    document.addEventListener("focusout", update);
+    update();
+    return () => {
+      viewport.removeEventListener("resize", update);
+      viewport.removeEventListener("scroll", update);
+      document.removeEventListener("focusin", update);
+      document.removeEventListener("focusout", update);
+    };
+  }, []);
 
   useEffect(() => {
     setMessages(conversation?.messages ?? []);
@@ -71,9 +99,10 @@ const ChatScreen = ({ currentMatch, conversation, currentUserId, refreshState })
   const imageUrl = profileImageUrl(currentMatch?.imageUrl);
   return currentMatch ? (
     <div className="glass chat-panel">
-      <h2 className="text-2xl font-bold mb-4">
-        Chat with {currentMatch.firstName} {currentMatch.lastName}
-      </h2>
+      <header className="chat-persona">
+        {imageUrl && <img src={imageUrl} alt="" />}
+        <h1>{currentMatch.firstName} {currentMatch.lastName}</h1>
+      </header>
 
       <div
         ref={chatContainerRef}
@@ -91,15 +120,6 @@ const ChatScreen = ({ currentMatch, conversation, currentUserId, refreshState })
                 message.authorId === currentUserId ? "flex-row-reverse" : "flex-row"
               }`}
             >
-              {message.authorId === currentUserId ? (
-                <User size={15} />
-              ) : (
-                <img
-                  src={imageUrl}
-                  className="w-11 h-11 rounded-full"
-                  alt={currentMatch.firstName}
-                />
-              )}
 
               <div
                 className={`max-w-xs px-4 py-2 rounded-2xl ${
@@ -117,11 +137,6 @@ const ChatScreen = ({ currentMatch, conversation, currentUserId, refreshState })
         {isTyping && (
           <div className="flex justify-start mb-4">
             <div className="flex items-end flex-row">
-              <img
-                src={imageUrl}
-                className="w-11 h-11 rounded-full"
-                alt={currentMatch.firstName}
-              />
               <div className="chat-bubble mr-2 px-4 py-3 rounded-2xl">
                 <div className="flex items-center gap-1">
                   {[0, 1, 2].map((dot) => (
@@ -139,14 +154,14 @@ const ChatScreen = ({ currentMatch, conversation, currentUserId, refreshState })
       </div>
 
       {error && <p role="alert" className="text-red-600 mb-3">{error}</p>}
-      <div className="flex items-center">
+      <div ref={composerRef} className="chat-composer flex items-center">
         <input
           type="text"
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={handleKeyPress}
           maxLength={4000}
-          disabled={isTyping}
+          readOnly={isTyping}
           className="flex-1 border-2 border-gray-300 rounded-full py-2 px-4 mr-2 focus:outline-none focus:border-blue-500 disabled:opacity-50"
           aria-label="Message"
           placeholder="Type a message..."

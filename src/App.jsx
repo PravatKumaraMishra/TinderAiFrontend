@@ -122,7 +122,8 @@ function SignedInApp({ account, onUpdated, onLogout, appearance, onAppearanceCha
       </div>
     </aside>
     <div className="workspace">
-      {screen !== "browse" && <header className="page-header"><h1>{screen === "account" ? "Profile" : screen === "matches" ? "Matches" : screen === "chat" ? "Conversation" : "Discover"}</h1></header>}
+      <header className="mobile-brand"><a className="brand" href="/" aria-label="TinderAI home"><img src="/icon.svg" alt="" />Tinder<span>AI</span></a></header>
+      {screen !== "browse" && screen !== "chat" && <header className="page-header"><h1>{screen === "account" ? "Profile" : screen === "matches" ? "Matches" : screen === "chat" ? "Conversation" : "Discover"}</h1></header>}
       {error && <p role="alert" className="notice error">{error}</p>}
       {!account.profile || screen === "account" ? <AccountScreen account={account} onUpdated={onUpdated} />
         : screen === "browse" ? <ProfileSelector profile={profile} onSwipe={swipe} disabled={busy} />

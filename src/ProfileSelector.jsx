@@ -7,7 +7,6 @@ export default function ProfileSelector({ profile, onSwipe, disabled }) {
     <article className="unified-profile glass" key={profile.id}>
       <div className="unified-photo">
         {profile.imageUrl ? <img src={imageUrl(profile.imageUrl)} alt={`${profile.firstName}'s AI persona`} /> : <div className="photo-placeholder"><span>{profile.firstName?.[0] || "?"}</span></div>}
-        <span className="photo-badge"><Sparkles size={14} />AI persona</span>
         <div className="photo-identity">
         {profile.myersBriggsPersonalityType && <span className="personality-label">{profile.myersBriggsPersonalityType}</span>}
         <h2>{profile.firstName}, {profile.age}</h2>
