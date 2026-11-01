@@ -104,3 +104,12 @@ Google sign-in automatically requests profile, birthday, and gender permissions 
 Profile photos accept JPG, PNG, or WebP files up to 500 KB. Users can crop, zoom, and reposition the image before saving a square JPEG.
 
 If Google returns `403 access_denied` saying the app is in testing, open Google Cloud Console → Google Auth Platform → Audience for the project owning this OAuth client. Add the signing-in Google account under Test users for development. For public access, publish the app and complete the verification required for birthday/gender scopes. This restriction is enforced by Google and cannot be bypassed in application code.
+
+## Legal pages
+
+Public Terms of Service and Privacy Policy are available at `/terms` and `/privacy`
+(with direct static copies at `/terms.html` and `/privacy.html`). Vercel rewrites
+serve these documents without authentication or an API connection. A shared footer below the app links to both, alongside GitHub, a creator credit,
+contact, and Buy Me a Coffee. The legal pages include the same footer links.
+Update `public/terms.html` and `public/privacy.html` when operators, providers,
+retention practices, or features change. Privacy/support contact: me.sanuvai@gmail.com.

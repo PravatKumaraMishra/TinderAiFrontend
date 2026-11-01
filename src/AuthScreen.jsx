@@ -34,5 +34,6 @@ export default function AuthScreen({ onAuthenticated, notice }) {
         <fieldset disabled={busy} className="space-y-3">{credentials}<button type="submit" className="auth-button">{busy ? "Signing in…" : "Sign in"}</button></fieldset>
       </form>}
     <button disabled={busy} type="button" className="text-blue-700 underline text-sm" onClick={() => { setRegister(!register); setError(""); }}>{register ? "Already registered? Sign in" : "New here? Create an account"}</button>
+    <p className="legal-notice">By creating an account or using TinderAI, you agree to the Terms of Service. Read our Privacy Policy to learn how your information is handled. For ages 18 and over.</p>
   </section></div>;
 }

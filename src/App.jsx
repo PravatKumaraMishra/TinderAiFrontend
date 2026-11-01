@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Compass, Heart, LogOut, UserRound, ChevronUp, Monitor } from "lucide-react";
 import { imageUrl } from "./api";
+import AppFooter from "./AppFooter";
 import AuthScreen from "./AuthScreen";
 import AccountScreen from "./AccountScreen";
 import ChatScreen from "./ChatScreen";
@@ -62,11 +63,11 @@ export default function App() {
   }
   if (restoring) return <main className="app-root" role="status">Restoring session…</main>;
   if (restoreError) return <main className="app-root"><p role="alert">{restoreError}</p><button onClick={() => window.location.reload()}>Retry</button></main>;
-  return <main className="app-root">
+  return <><main className="app-root">
     {account && notice && <p role="alert">{notice}</p>}
     {account ? <SignedInApp key={account.id} account={account} onUpdated={setAccount} onLogout={signOut} appearance={appearance} onAppearanceChange={setAppearance} />
       : <AuthScreen onAuthenticated={authenticated} notice={notice} />}
-  </main>;
+  </main><AppFooter /></>;
 }
 
 function SignedInApp({ account, onUpdated, onLogout, appearance, onAppearanceChange }) {
