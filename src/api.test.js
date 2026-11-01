@@ -128,3 +128,27 @@ test("authentication uses the frontend origin to avoid third-party cookies", asy
     method: "POST", authenticated: false, body: { email: "alice@example.com", password: "password" },
   });
 });
+
+test("production restores a session through same-origin API even with a localhost build setting", async () => {
+  const { readFile } = await import("node:fs/promises");
+  const source = await readFile(new URL("./api.js", import.meta.url), "utf8");
+  const productionSource = source.replaceAll("import.meta.env", JSON.stringify({
+    PROD: true, VITE_BACKEND_URL: "http://localhost:8080",
+  }));
+  const production = await import(`data:text/javascript;base64,${Buffer.from(productionSource).toString("base64")}`);
+  const requests = [];
+  globalThis.fetch = async (url, options) => {
+    requests.push(url);
+    if (url === "/auth/refresh") return Response.json({ accessToken: "restored-token" });
+    assert.equal(url, "/api/users/me");
+    assert.equal(options.headers.Authorization, "Bearer restored-token");
+    return Response.json({ id: "restored-user" });
+  };
+  await production.refreshSession();
+  assert.equal((await production.apiRequest("/users/me")).id, "restored-user");
+  assert.deepEqual(requests, ["/auth/refresh", "/api/users/me"]);
+  assert.equal(production.imageUrl("photo.png"), "/api/images/photo.png");
+  const deployment = JSON.parse(await readFile(new URL("../vercel.json", import.meta.url), "utf8"));
+  assert.equal(deployment.rewrites.find(rule => rule.source === "/api/:path*").destination,
+    "https://tinderaibackend.onrender.com/:path*");
+});

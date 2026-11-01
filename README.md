@@ -17,7 +17,7 @@ Start [TinderAiBackend](https://github.com/PravatKumaraMishra/TinderAiBackend) s
 then run `npm run dev`. The default backend is
 `http://localhost:8080`. Copy `.env.example` to `.env.local` if you need to override:
 
-- `VITE_BACKEND_URL`: your backend URL.
+- `VITE_BACKEND_URL`: your development/preview backend URL. Production builds use the same-origin `/api` proxy.
 - `VITE_GOOGLE_CLIENT_ID`: Google OAuth Web client ID. The supplied public client ID
   is configured as a fallback in the Google button component.
 
@@ -94,7 +94,10 @@ The local Vite proxy removes Secure and converts SameSite=None to Lax on HTTP;
 production HTTPS cookies retain their security attributes. The backend must allow
 the frontend Origin in CORS. Restart Vite after changing proxy configuration.
 If the backend host changes, update both `VITE_BACKEND_URL` and the Vercel rewrite.
-Other hosting providers must provide the same `/auth/*` reverse proxy.
+Production API and bundled-image requests use `/api/*`, which Vercel forwards to
+the Render backend after removing `/api`. This prevents a missing or local build
+environment value from sending deployed requests to localhost. Other hosting
+providers must provide both `/auth/*` and `/api/*` reverse proxies.
 Sign in once after updating: cookies on the Render host cannot migrate to localhost.
 
 ### Google profile import

@@ -5,6 +5,10 @@
       "destination": "https://tinderaibackend.onrender.com/auth/:path*"
     },
     {
+      "source": "/api/:path*",
+      "destination": "https://tinderaibackend.onrender.com/:path*"
+    },
+    {
       "source": "/terms",
       "destination": "/terms.html"
     },

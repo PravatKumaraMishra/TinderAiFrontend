@@ -1,4 +1,6 @@
-export const BACKEND_URL = (import.meta.env?.VITE_BACKEND_URL || "http://localhost:8080").replace(/\/$/, "");
+// Production uses the same-origin API proxy, independent of local build environment values.
+export const BACKEND_URL = import.meta.env?.PROD ? "/api"
+  : (import.meta.env?.VITE_BACKEND_URL || "http://localhost:8080").replace(/\/$/, "");
 // Auth stays on the frontend origin so HttpOnly cookies are first-party.
 // Vite/Vercel forward /auth requests to the configured backend.
 let accessToken = null;
