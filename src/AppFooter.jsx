@@ -3,7 +3,7 @@ export default function AppFooter() {
     <nav className="footer-links" aria-label="Footer">
       <a href="https://github.com/PravatKumaraMishra/TinderAiFrontend" target="_blank" rel="noopener noreferrer">GitHub</a>
       <a href="mailto:me.sanuvai@gmail.com">Contact</a>
-      <span>Made with love by <a href="https://github.com/PravatKumaraMishra" target="_blank" rel="noopener noreferrer">Pravat Kumar Mishra</a></span>
+      <span>Made with ❤️ by <a href="https://github.com/PravatKumaraMishra" target="_blank" rel="noopener noreferrer">Pravat Kumar Mishra</a></span>
       <a href="/terms">Terms of Service</a>
       <a href="/privacy">Privacy Policy</a>
     </nav>

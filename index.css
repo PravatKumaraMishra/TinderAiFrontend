@@ -1308,3 +1308,17 @@ select.auth-input, .system-theme select {
   .floating-actions .swipe { width:41.85px; height:41.85px; }
   .floating-actions .swipe > svg { width:20.25px; height:20.25px; }
 }
+
+/* Adapt the account control to the sidebar's available width. */
+@media (aspect-ratio > 3/4) {
+  .sidebar { container-type:inline-size; }
+  .profile-trigger .avatar { flex-shrink:0; }
+  @container (max-width:190px) {
+    .profile-trigger { flex-direction:column; gap:8px; padding:14px 4px 0; }
+    .profile-name { flex:none; width:100%; min-width:0; text-align:center; overflow:visible; }
+    .profile-name strong { display:block; white-space:normal; overflow:visible; overflow-wrap:anywhere; text-overflow:clip; }
+    .profile-name small { display:none; }
+    .profile-trigger > svg { display:none; }
+    .profile-menu { bottom:calc(100% + 12px); }
+  }
+}
